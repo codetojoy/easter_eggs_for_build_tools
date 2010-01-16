@@ -21,9 +21,3 @@ I like to keep examples/eggs around for reference, and wanted to share with the 
     - Gant / Groovy
     - Gradle / Groovy 
 
-*** Ant
-
-1. clean        cleans all class files
-2. compile      compiles Pojo and a simple transaction manager
-3. test         runs an integration test against inmemory HSQLDB
-
