@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<project name="Hibernate" default="test" basedir=".">
+    
+    <property file="build.properties"/>    
+    <property file="db.properties"/>
+    
+    <!-- Hibernate Tasks and Targets -->
+    <path id="hibernate.classpath">
+        <pathelement path="${classes.dir}"/>
+        <pathelement path="${config.dir}"/>
+
+        <pathelement path="${driver.jar}"/>
+
+<!--
+<pathelement path="${freemarker.jar}"/>
+-->
+
+        <pathelement path="${hib.jar}"/>
+        <pathelement path="${jta.jar}"/>
+        <pathelement path="${antlr.jar}"/>
+        <pathelement path="${commons.logging.jar}"/>
+        <pathelement path="${commons.collections.jar}"/>
+        <pathelement path="${javassist.jar}"/>
+        <pathelement path="${dom4j.jar}"/>
+		<pathelement path="${slf4j.api.jar}"/>
+		<pathelement path="${slf4j.simple.jar}"/>
+    </path>
+
+    <!-- Hibernate Tasks and Targets -->
+    <path id="test.classpath">
+        <path refid="hibernate.classpath"/>
+        <pathelement path="${junit.jar}"/>
+    </path>
+            
+    <target name="init">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${reports.dir}"/>
+    </target>
+        
+    <target name="compile" depends="init" description="standard compile" >
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="hibernate.classpath"/>    
+        <javac srcdir="${test.dir}" destdir="${classes.dir}" classpathref="test.classpath"/>    
+    </target>
+    
+    <target name="test" depends="compile" description="runs integration test">
+        <junit printsummary="yes" fork="yes" haltonfailure="yes">
+            <classpath>
+                  <path refid="test.classpath"/>
+            </classpath>
+          <formatter type="plain"/>
+          <batchtest fork="yes" todir="${reports.dir}">
+            <fileset dir="${test.dir}">
+              <include name="**/*TestCase.java"/>
+            </fileset>
+          </batchtest>
+        </junit>
+    </target>  
+
+    <target name="clean" description="cleans all class files" >
+        <delete dir="${classes.dir}"/>
+    </target>
+        
+</project>
