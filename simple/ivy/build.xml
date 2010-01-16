@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<project name="sandbox" default="all" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    
+	<property file="build.properties"/>	
+
+<!--
+    <ivy:cachepath pathid="jar.compile.classpath" conf="compile"/>
+    <ivy:cachepath pathid="jar.test.classpath" conf="test"/>
+-->
+
+    <target name="resolve" description="retrieve dependencies with ivy">
+        <ivy:retrieve/>
+    </target>    
+
+    <target name="ivy-retrieve" depends="resolve">
+        <ivy:retrieve pattern="${ivy.lib.dir}/[conf]/[artifact]-[revision].[ext]" sync="true"/>
+    </target>	
+
+    <target name="classpaths" depends="ivy-retrieve">
+        <path id="compile.classpath">
+            <fileset dir="${ivy.lib.dir}/compile" includes="*.jar"/>
+        </path>
+        <path id="test.classpath">
+            <fileset dir="${ivy.lib.dir}/test" includes="*.jar"/>
+            <pathelement path="${classes.dir}"/>
+            <pathelement path="${config.dir}"/>
+        </path>
+    </target>
+            
+    <target name="init" depends="classpaths">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${reports.dir}"/>
+    </target>
+        
+    <target name="compile" depends="init" description="compile" >
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="compile.classpath"/>    
+        <javac srcdir="${test.dir}" destdir="${classes.dir}" classpathref="compile.classpath"/>    
+    </target>
+    
+    <target name="test" depends="compile" description="runs integration test">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<classpath>
+			  	<path refid="test.classpath"/>
+			</classpath>
+		  <formatter type="plain"/>
+		  <batchtest fork="yes" todir="${reports.dir}">
+		    <fileset dir="${test.dir}">
+		      <include name="**/*TestCase.java"/>
+		    </fileset>
+		  </batchtest>
+		</junit>
+    </target>  
+
+    <target name="clean" description="cleans all class files" >
+        <delete dir="${classes.dir}"/>
+    </target>
+       
+  
+</project>
