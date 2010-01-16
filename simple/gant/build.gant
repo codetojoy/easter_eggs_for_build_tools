@@ -1,0 +1,71 @@
+
+ant.property(file: 'build.properties')
+
+// clean (implicit target)
+includeTargets << gant.targets.Clean
+cleanDirectory << ant.project.properties.'classes.dir'
+cleanDirectory << ant.project.properties.'reports.dir'
+
+includeTool << gant.tools.Ivy 
+ 
+target( 'resolve' : 'retrieve dependencies with ivy') {
+    ivy.retrieve()
+}
+
+target( 'ivy-retrieve' : '' ) {
+    depends( 'resolve' )
+    ivy.retrieve( pattern : '${ivy.lib.dir}/[conf]/[artifact]-[revision].[ext]',
+                  sync : 'true' )
+}
+
+target( 'classpaths' : '' ) {
+    depends( 'ivy-retrieve' )
+    ant.path ( id: 'compile.classpath' ) {
+        ant.fileset( dir : '${ivy.lib.dir}/compile' ) { 
+            ant.include( name : '*.jar' )
+        }
+    }
+    ant.path ( id: 'test.classpath' ) {
+        ant.fileset( dir : '${ivy.lib.dir}/test' ) {
+            ant.include( name : '*.jar' )
+        }
+        ant.pathelement( path : '${classes.dir}' )
+        ant.pathelement( path : '${config.dir}' )
+    }
+}
+
+target( 'init' : '' ) {
+    depends( 'classpaths' )
+    ant.mkdir( dir : '${classes.dir}' )
+    ant.mkdir( dir : '${reports.dir}' )
+}
+
+// Note Groovy closure as support for a target:
+def doCompile = { src ->
+   ant.javac( srcdir : src, 
+              destdir : '${classes.dir}',
+              classpathref : 'compile.classpath' ) 
+}
+
+target( 'compile' : 'compile' ) {
+    depends(init)
+    doCompile( '${src.dir}' )
+    doCompile( '${test.dir}' )
+}
+
+target( 'test' : 'runs integration test' ) {
+    depends(compile)
+    ant.junit( printsummary : 'yes', fork : 'yes', haltonfailure : 'yes' ) {
+        ant.classpath() {
+           ant.path( refid : 'test.classpath' )
+        }
+
+        formatter(type:'plain')
+        ant.batchtest( fork:'yes', todir: '${reports.dir}' ) {
+            ant.fileset( dir : '${test.dir}' ) {
+                ant.include( name : '**/*TestCase.java' )
+            }
+        } 
+    }
+}
+
