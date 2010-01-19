@@ -1,0 +1,43 @@
+
+ant.property(file : 'build.properties')
+ant.property(file : 'db.properties')
+
+task classpaths << {
+ant.path(id : 'hibernate.classpath') {
+	ant.pathelement(path : '${classes.dir}')
+	ant.pathelement(path : '${config.dir}')
+
+	ant.pathelement(path : '${driver.jar}')
+
+	ant.pathelement(path : '${hib.jar}')
+	ant.pathelement(path : '${jta.jar}')
+	ant.pathelement(path : '${antlr.jar}')
+	ant.pathelement(path : '${commons.logging.jar}')
+	ant.pathelement(path : '${commons.collections.jar}')
+	ant.pathelement(path : '${javassist.jar}')
+	ant.pathelement(path : '${dom4j.jar}')
+	ant.pathelement(path : '${slf4j.api.jar}')
+	ant.pathelement(path : '${slf4j.simple.jar}')
+}
+
+ant.path(id : 'testx.classpath') {
+	ant.path(refid : 'hibernate.classpath')
+	ant.pathelement(path : '${junit.jar}')
+}
+}
+
+task init(dependsOn: classpaths) << {
+	ant.mkdir(dir : '${classes.dir}')
+	ant.mkdir(dir : '${reports.dir}')
+}
+
+task clean << {
+	ant.delete(dir : '${classes.dir}')
+	ant.delete(dir : '${reports.dir}')
+}
+
+task compile(dependsOn: 'init', description: 'standard compile') << {
+//	ant.javac(srcdir : '${src.dir}', destdir : '${classes.dir}', classpathref : '${hibernate.classpath}')
+	ant.javac(srcdir : '${test.dir}', destdir : '${classes.dir}', classpathref : '${testx.classpath}')
+}
+
