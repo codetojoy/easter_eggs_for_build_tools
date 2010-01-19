@@ -12,10 +12,6 @@
 
         <pathelement path="${driver.jar}"/>
 
-<!--
-<pathelement path="${freemarker.jar}"/>
--->
-
         <pathelement path="${hib.jar}"/>
         <pathelement path="${jta.jar}"/>
         <pathelement path="${antlr.jar}"/>
@@ -32,6 +28,11 @@
         <path refid="hibernate.classpath"/>
         <pathelement path="${junit.jar}"/>
     </path>
+
+    <target name="clean" description="cleans all class files" >
+        <delete dir="${classes.dir}"/>
+        <delete dir="${reports.dir}"/>
+    </target>
             
     <target name="init">
         <mkdir dir="${classes.dir}"/>
@@ -56,9 +57,5 @@
           </batchtest>
         </junit>
     </target>  
-
-    <target name="clean" description="cleans all class files" >
-        <delete dir="${classes.dir}"/>
-    </target>
         
 </project>
