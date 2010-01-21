@@ -3,58 +3,58 @@ ant.property(file : 'build.properties')
 ant.property(file : 'db.properties')
 
 ant.path(id : 'hibernate.classpath') {
-	ant.pathelement(path : '${classes.dir}')
-	ant.pathelement(path : '${config.dir}')
+    ant.pathelement(path : '${classes.dir}')
+    ant.pathelement(path : '${config.dir}')
 
-	ant.pathelement(path : '${driver.jar}')
+    ant.pathelement(path : '${driver.jar}')
 
-	ant.pathelement(path : '${hib.jar}')
-	ant.pathelement(path : '${jta.jar}')
-	ant.pathelement(path : '${antlr.jar}')
-	ant.pathelement(path : '${commons.logging.jar}')
-	ant.pathelement(path : '${commons.collections.jar}')
-	ant.pathelement(path : '${javassist.jar}')
-	ant.pathelement(path : '${dom4j.jar}')
-	ant.pathelement(path : '${slf4j.api.jar}')
-	ant.pathelement(path : '${slf4j.simple.jar}')
+    ant.pathelement(path : '${hib.jar}')
+    ant.pathelement(path : '${jta.jar}')
+    ant.pathelement(path : '${antlr.jar}')
+    ant.pathelement(path : '${commons.logging.jar}')
+    ant.pathelement(path : '${commons.collections.jar}')
+    ant.pathelement(path : '${javassist.jar}')
+    ant.pathelement(path : '${dom4j.jar}')
+    ant.pathelement(path : '${slf4j.api.jar}')
+    ant.pathelement(path : '${slf4j.simple.jar}')
 }
 
 ant.path(id : 'test.classpath') {
-	ant.path(refid : 'hibernate.classpath')
-	ant.pathelement(path : '${junit.jar}')
+    ant.path(refid : 'hibernate.classpath')
+    ant.pathelement(path : '${junit.jar}')
 }
 
 task init << {
-	ant.mkdir(dir : '${classes.dir}')
-	ant.mkdir(dir : '${reports.dir}')
+    ant.mkdir(dir : '${classes.dir}')
+    ant.mkdir(dir : '${reports.dir}')
 }
 
 task clean << {
-	ant.delete(dir : '${classes.dir}')
-	ant.delete(dir : '${reports.dir}')
+    ant.delete(dir : '${classes.dir}')
+    ant.delete(dir : '${reports.dir}')
 }
 
 // NOTE: Groovy closure, not a task
 def doCompile = { source, cpRef ->
-	ant.javac(srcdir : source, destdir : '${classes.dir}', classpathref : cpRef)
+    ant.javac(srcdir : source, destdir : '${classes.dir}', classpathref : cpRef)
 }
 
 task compile(dependsOn: 'init', description: 'standard compile') << {
-	doCompile('${src.dir}', 'hibernate.classpath')
-	doCompile('${test.dir}', 'test.classpath')
+    doCompile('${src.dir}', 'hibernate.classpath')
+    doCompile('${test.dir}', 'test.classpath')
 }
 
 task test(dependsOn: 'compile', description: 'runs integration test') << {
-	ant.junit(printsummary : 'yes', fork : 'yes', haltonfailure : 'yes') {
-		ant.classpath() {
-			ant.path(refid : 'test.classpath')
-		}
-		formatter(type : 'plain')
-		ant.batchtest(fork : 'yes', todir : '${reports.dir}') {
-			ant.fileset(dir : '${test.dir}') {
-				include(name : '**/*TestCase.java')
-			}
-		}
-	}
+    ant.junit(printsummary : 'yes', fork : 'yes', haltonfailure : 'yes') {
+        ant.classpath() {
+            ant.path(refid : 'test.classpath')
+        }
+        formatter(type : 'plain')
+        ant.batchtest(fork : 'yes', todir : '${reports.dir}') {
+            ant.fileset(dir : '${test.dir}') {
+                include(name : '**/*TestCase.java')
+            }
+        }
+    }
 }
 
