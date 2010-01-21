@@ -1,6 +1,4 @@
 
-NOTE this doesn't work yet
-
 *** Requirements
 
 - Gradle 0.8
@@ -8,6 +6,6 @@ NOTE this doesn't work yet
 
 *** Usage 
 
-ant clean 
-ant compile
-ant test 
+gradle clean 
+gradle compile
+gradle test 
