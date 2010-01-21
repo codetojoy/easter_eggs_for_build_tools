@@ -2,7 +2,6 @@
 ant.property(file : 'build.properties')
 ant.property(file : 'db.properties')
 
-task classpaths << {
 ant.path(id : 'hibernate.classpath') {
 	ant.pathelement(path : '${classes.dir}')
 	ant.pathelement(path : '${config.dir}')
@@ -20,13 +19,12 @@ ant.path(id : 'hibernate.classpath') {
 	ant.pathelement(path : '${slf4j.simple.jar}')
 }
 
-ant.path(id : 'testx.classpath') {
+ant.path(id : 'test.classpath') {
 	ant.path(refid : 'hibernate.classpath')
 	ant.pathelement(path : '${junit.jar}')
 }
-}
 
-task init(dependsOn: classpaths) << {
+task init << {
 	ant.mkdir(dir : '${classes.dir}')
 	ant.mkdir(dir : '${reports.dir}')
 }
@@ -36,8 +34,27 @@ task clean << {
 	ant.delete(dir : '${reports.dir}')
 }
 
+// NOTE: Groovy closure, not a task
+def doCompile = { source, cpRef ->
+	ant.javac(srcdir : source, destdir : '${classes.dir}', classpathref : cpRef)
+}
+
 task compile(dependsOn: 'init', description: 'standard compile') << {
-//	ant.javac(srcdir : '${src.dir}', destdir : '${classes.dir}', classpathref : '${hibernate.classpath}')
-	ant.javac(srcdir : '${test.dir}', destdir : '${classes.dir}', classpathref : '${testx.classpath}')
+	doCompile('${src.dir}', 'hibernate.classpath')
+	doCompile('${test.dir}', 'test.classpath')
+}
+
+task test(dependsOn: 'compile', description: 'runs integration test') << {
+	ant.junit(printsummary : 'yes', fork : 'yes', haltonfailure : 'yes') {
+		ant.classpath() {
+			ant.path(refid : 'test.classpath')
+		}
+		formatter(type : 'plain')
+		ant.batchtest(fork : 'yes', todir : '${reports.dir}') {
+			ant.fileset(dir : '${test.dir}') {
+				include(name : '**/*TestCase.java')
+			}
+		}
+	}
 }
 
