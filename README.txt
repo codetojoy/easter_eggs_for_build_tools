@@ -21,3 +21,9 @@ I like to keep examples/eggs around for reference, and wanted to share with the 
     - Gant / Groovy
     - Gradle / Groovy 
 
+*** Subprojects
+
+-- 'simple' is a basic project structure with a Pojo, a Hibernate mapping,
+and an integration test
+
+-- TODO: other projects are in the works
