@@ -1,4 +1,8 @@
 
+NOTE: this project is NOT idiomatic Gradle. For example, it does not use
+plugins. It uses Ant-style patterns. I'm including it because it does work,
+and shows the flexibility of Gradle.
+
 *** Requirements
 
 - Gradle 0.8
