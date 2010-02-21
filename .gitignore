@@ -1,2 +1,5 @@
 simple/*/classes
+simple/*/*/classes
+
 simple/*/reports
+simple/*/*/reports
